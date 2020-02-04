@@ -11,13 +11,17 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
 
+import com.processor.parser.ParseContent;
+
 import org.apache.commons.io.FilenameUtils;
 
 public class MonitorDirectory {
     private final String INPUT_FOLDER = "C:\\Users\\nikolas.daroit\\Documents\\workspace\\input\\";
     private final String VALID_EXTENSION = "dat";
-    public MonitorDirectory(){
+    private ParseContent parseContent;
 
+    public MonitorDirectory(){
+        parseContent = new ParseContent();
     }
     /**
      * Get all new file inputs
@@ -42,7 +46,7 @@ public class MonitorDirectory {
                     System.out.println("File Created:" + fileName);
                     Path filePath = FileSystems.getDefault().getPath(this.INPUT_FOLDER, fileName);
                     if (isValidFile(filePath)){
-                        ReadFileContents(filePath);
+                        parseContent.parse(filePath);
                     }
                     
 				}
@@ -69,22 +73,6 @@ public class MonitorDirectory {
         return true;
     }
 
-    /**
-     * 
-     * @param filePath
-     */
-    public void ReadFileContents(Path filePath){
-        System.out.println(filePath);
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(filePath);
-            for (String line: lines) {
-               System.out.println(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     
     /**
      * 
