@@ -1,5 +1,7 @@
 package com.processor;
 
+import java.io.IOException;
+
 import com.processor.reader.MonitorDirectory;
 
 /**
@@ -13,11 +15,11 @@ public class App
     {
         MonitorDirectory   monitor = new MonitorDirectory();
         try {
-            monitor.MonitorDirectoryListener();
-        } catch (Exception e) {
-            //TODO: handle exception
-            System.out.println(e);
+            System.out.println("Sarting monitoring, waiting for file input");
+            monitor.monitorDirectoryListener();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
-        System.out.println( "Hello World!" );
+        
     }
 }

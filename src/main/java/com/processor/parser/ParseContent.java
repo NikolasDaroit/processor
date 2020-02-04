@@ -1,10 +1,15 @@
 package com.processor.parser;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.processor.reader.FileReader;
+import com.processor.domain.Customer;
+import com.processor.domain.Sale;
+import com.processor.domain.SaleItem;
+import com.processor.domain.Salesperson;
+
+import lombok.Getter;
+
 
 public class ParseContent {
     private final String DELIMITER = "\\u00E7";
@@ -31,21 +36,28 @@ public class ParseContent {
     private final int ITEM_QUANTITY = 1;
     private final int ITEM_PRICE = 2;
 
-    private FileReader fReader;
+    @Getter
     private List<Customer> customers;
+    @Getter
     private List<Salesperson> salesperson;
+    @Getter
     private List<Sale> sales;
+    @Getter
+    private Report report;
 
     public ParseContent(){
-        fReader = new FileReader();
         this.customers = new ArrayList<Customer>();
         this.salesperson = new ArrayList<Salesperson>();
         this.sales = new ArrayList<Sale>();
     }
     
-    public void parse(Path filePath){
-        List<String> lines = fReader.readFileContents(filePath);
-
+    /**
+     * Parse data from file and save to output file
+     * @param fileName
+     * @param list
+     */
+    public void parse(String fileName, List<String> lines){
+        this.clear();
         for (String line : lines){
             String[] itemData = line.split(this.DELIMITER);
             
@@ -79,19 +91,33 @@ public class ParseContent {
             }
             
         }
-        String fileName = filePath.getFileName().toString();
-        System.out.println("finish processing");
+
+        this.saveReport(fileName);
+        
+    }
+
+    private Report generateReport(String fileName){
         Report report = Report.builder()
-                        .customers(this.customers)
-                        .sales(this.sales)
-                        .salesperson(this.salesperson)
-                        .build();
+        .customers(this.customers)
+        .sales(this.sales)
+        .salesperson(this.salesperson)
+        .build();
+        this.report = report;
+        return this.report;
+    }
+    private void saveReport(String fileName){
+        Report report = this.generateReport(fileName);
         report.saveReport(fileName);
     }
 
+    /**
+     * Parse items from sale
+     * @param itemsData
+     * @return list of SaleItem
+     */
     public List<SaleItem> parseItems(String itemsData){
         String[] itemList = itemsData.split(this.ITEM_DELIMITER);
-        List listSaleItems = new ArrayList<SaleItem>();
+        List<SaleItem> listSaleItems = new ArrayList<SaleItem>();
         for (String rawSaleItem : itemList) {
             rawSaleItem = rawSaleItem.replace("[", "").replace("]", "");
 
@@ -104,6 +130,16 @@ public class ParseContent {
             listSaleItems.add(saleItem);
         }
         return listSaleItems;
+
+    }
+
+    /**
+     * Reset items from list
+     */
+    private void clear(){
+        this.salesperson.clear();
+        this.customers.clear();
+        this.sales.clear();
 
     }
 }

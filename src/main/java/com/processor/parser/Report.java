@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.processor.domain.Customer;
+import com.processor.domain.Sale;
+import com.processor.domain.Salesperson;
+
 import org.apache.commons.io.FilenameUtils;
 
 import lombok.AllArgsConstructor;
@@ -25,27 +29,35 @@ public class Report {
     private List<Salesperson> salesperson;
     private List<Sale> sales;
     
-    private Integer numberOfCustomers;
-    private Integer numberOfSalesperson;
-    private Float mostExpensiveSaleId;
-    private String worstSalesperson;
-    
-    private static final String FINAL_FILE_EXTENSION = ".done.dat";
-    private final String OUTPUT_FOLDER = "C:\\Users\\nikolas.daroit\\Documents\\workspace\\output\\";
-    
+    private final String FINAL_FILE_EXTENSION = ".done.dat";
+    private final String OUTPUT_FOLDER = "\\data\\out\\";
+    private final String HOME_DIR = "user.home";
+
     private final String QTD_CLIENTES = "Quantidade de clientes no arquivo de entrada";
     private final String QTD_VENDEDOR = "Quantidade de vendedor no arquivo de entrada";
     private final String ID_VENDA = "ID da venda mais cara";
     private final String PIOR_VENDEDOR = "O pior vendedor";
 
+    /**
+     * Get total count of customers
+     * @return number of customers
+     */
     public int getNumberOfCustomers() {
         return this.customers.size();
     }
 
+    /**
+     * Get total count of salesperson
+     * @return number of salesperson
+     */
     public int getNumberOfSalesperson() {
         return this.salesperson.size();
     }
 
+    /**
+     * Find most expensive sale
+     * @return sale id
+     */
     public int getMostExpensiveSaleId() {
         int saleId = 0;
         Float maxSale = 0.0f;
@@ -57,6 +69,10 @@ public class Report {
         return saleId;
     }
 
+    /**
+     * Order sales by salesperson
+     * @return map of sales by salesperson name
+     */
     private HashMap<String, List<Sale>> getSaleBySalesperson() {
         HashMap<String, List<Sale>> saleBySalesperson = new HashMap<String, List<Sale>>();
         for (Sale sale : this.sales) {
@@ -73,6 +89,10 @@ public class Report {
 
     }
 
+    /**
+     * Get the salesperson with the lower sum of sales
+     * @return salesperson name
+     */
     public String getWorstSalesperson() {
         String worstSalesperson = null;
         Float worstTotal = 0.0f;
@@ -93,15 +113,19 @@ public class Report {
         return worstSalesperson;
     }
 
+    /**
+     * Save report to file
+     * @param fileName
+     */
     public void saveReport(String fileName) {
-        String baseFileName  = FilenameUtils.removeExtension(fileName);
-        String newFilePath = this.OUTPUT_FOLDER+baseFileName+this.FINAL_FILE_EXTENSION;
+        
+        String baseFileName = FilenameUtils.removeExtension(fileName);
+        String newFilePath = System.getProperty(this.HOME_DIR) + this.OUTPUT_FOLDER + baseFileName + this.FINAL_FILE_EXTENSION;
         Path path = Paths.get(newFilePath);
         File file = new File(newFilePath);
         try {
             file.createNewFile();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } // if file already exists will do nothing
         String output_text = String.format("%s = %d\n%s = %d\n%s = %d\n%s = %s", 
@@ -112,6 +136,7 @@ public class Report {
 
         try(BufferedWriter writer = Files.newBufferedWriter(path, Charset.forName("UTF-8"))){
             writer.write(output_text);
+            System.out.println("Report Saved: "+baseFileName + this.FINAL_FILE_EXTENSION);
         }catch(IOException ex){
             ex.printStackTrace();
         }

@@ -1,4 +1,4 @@
-package com.processor.parser;
+package com.processor.domain;
 
 import java.util.List;
 
